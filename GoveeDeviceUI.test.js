@@ -81,11 +81,11 @@ export default class GoveeDeviceUI
             default:
                 if (this.ledCount === 10 && this.goveeDevice.type !== PROTOCOL_SINGLE_COLOR)
                 {
-                    this.device.setSize([21, 9]);
+                    this.device.setSize(new Array(21, 9));
                     this.device.setControllableLeds(this.ledNames, this.ledPositions);
                 } else
                 {
-                    this.device.setSize([this.ledCount, 1]);
+                    this.device.setSize(new Array(this.ledCount, 1));
                     this.device.setControllableLeds(this.ledNames, this.ledPositions);
                 }
                 break;
@@ -127,16 +127,17 @@ export default class GoveeDeviceUI
                 "Bottom Left"
             ];
 
-            this.ledPositions = [,
- ,
- ,
- ,
- ,
- ,
- ,
- ,
- ,
-                [5, 8]
+            this.ledPositions = [
+                new Array(0, 6),
+                new Array(0, 2),
+                new Array(2, 0),
+                new Array(7, 0),
+                new Array(13, 0),
+                new Array(18, 0),
+                new Array(20, 2),
+                new Array(20, 6),
+                new Array(15, 8),
+                new Array(5, 8)
             ];
             return;
         }
@@ -144,7 +145,7 @@ export default class GoveeDeviceUI
         for (let i = 0; i < count; i++)
         {
             this.ledNames.push(`Led ${i + 1}`);
-            this.ledPositions.push([i, 0]);
+            this.ledPositions.push(new Array(i, 0));
         }
     }
 
@@ -156,10 +157,10 @@ export default class GoveeDeviceUI
         {
             if (i % 2 === 0)
             {
-                result.push([255, 0, 0]);
+                result.push(new Array(255, 0, 0));
             } else
             {
-                result.push([0, 0, 255]);
+                result.push(new Array(0, 0, 255));
             }
         }
         
@@ -229,11 +230,11 @@ export default class GoveeDeviceUI
         let RGBData = [];
         for (let i = 0; i < inlineColors.length; i = i + 3)
         {
-            RGBData.push([
+            RGBData.push(new Array(
                 inlineColors[i],
                 inlineColors[i+1],
                 inlineColors[i+2]
-            ]);
+            ));
         }
 
         let totalColors = RGBData.length;
@@ -241,7 +242,7 @@ export default class GoveeDeviceUI
         {
             for (let i = totalColors; i < this.ledCount; i++)
             {
-                RGBData.push([0, 0, 0]);
+                RGBData.push(new Array(0, 0, 0));
             }
         }
         return RGBData;
@@ -270,7 +271,7 @@ export default class GoveeDeviceUI
         for (let i = 0; i < this.ledPositions.length; i++)
         {
             const ledPosition = this.ledPositions[i];
-            const color = this.device.color(ledPosition[0], ledPosition[1]);
+            const color = this.device.color(ledPosition.at(0), ledPosition.at(1));
             RGBData.push(color);
         }
     
@@ -281,9 +282,9 @@ export default class GoveeDeviceUI
     {
         const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hexColor);
         const colors = [];
-        colors[0] = parseInt(result[1], 16);
-        colors[1] = parseInt(result[2], 16);
-        colors[2] = parseInt(result[3], 16);
+        colors.push(parseInt(result.at(1), 16));
+        colors.push(parseInt(result.at(2), 16));
+        colors.push(parseInt(result.at(3), 16));
 
         return colors;
     }
