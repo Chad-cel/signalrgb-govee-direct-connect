@@ -7,7 +7,7 @@ export default class GoveeDeviceUI
 {
     constructor(device, controller)
     {
-        this.device = device
+        this.device = device;
         this.controller = controller;
 
         device.log('Setting up Govee device and udp server');
@@ -62,7 +62,7 @@ export default class GoveeDeviceUI
             case 3:
                 this.log('This should be two subdevices');
                 this.device.SetIsSubdeviceController(true);
-                for (let num = 1; num <=2; num++)
+                for (let num = 1; num <= 2; num++)
                 {
                     let subDeviceId = `${this.goveeDevice.id}:${num}`;
                     this.device.createSubdevice(subDeviceId);
@@ -79,8 +79,15 @@ export default class GoveeDeviceUI
                 this.device.addChannel(`Govee [${this.goveeDevice.id}]`, this.ledCount);
                 break;
             default:
-                this.device.setSize([this.controller.device.leds, 1]);
-                this.device.setControllableLeds(this.ledNames, this.ledPositions);
+                if (this.ledCount === 10 && this.goveeDevice.type !== PROTOCOL_SINGLE_COLOR)
+                {
+                    this.device.setSize([21, 9]);
+                    this.device.setControllableLeds(this.ledNames, this.ledPositions);
+                } else
+                {
+                    this.device.setSize([this.ledCount, 1]);
+                    this.device.setControllableLeds(this.ledNames, this.ledPositions);
+                }
                 break;
         }
     }
@@ -88,23 +95,53 @@ export default class GoveeDeviceUI
     setupTestProperty()
     {
         this.device.addProperty({
-            "property":"testLedCount",
-            "group":"lighting",
-            "label":"Test led count",
-            "step":"1",
-            "type":"number",
-            "min":"1",
+            "property": "testLedCount",
+            "group": "lighting",
+            "label": "Test led count",
+            "step": "1",
+            "type": "number",
+            "min": "1",
             "max": this.ledCount,
             "default": this.ledCount,
-            "live" : true});
+            "live": true
+        });
     }
 
     createLedMap(count)
     {
         this.ledNames = [];
         this.ledPositions = [];
+
+        if (count === 10 && this.goveeDevice.type !== PROTOCOL_SINGLE_COLOR && (this.goveeDevice.split === 1 || this.goveeDevice.split === 2))
+        {
+            this.ledNames = [
+                "Left Bottom",
+                "Left Top",
+                "Top Left",
+                "Top Mid-Left",
+                "Top Mid-Right",
+                "Top Right",
+                "Right Top",
+                "Right Bottom",
+                "Bottom Right",
+                "Bottom Left"
+            ];
+
+            this.ledPositions = [,
+ ,
+ ,
+ ,
+ ,
+ ,
+ ,
+ ,
+ ,
+                [5, 8]
+            ];
+            return;
+        }
     
-        for(let i = 0; i < count; i++)
+        for (let i = 0; i < count; i++)
         {
             this.ledNames.push(`Led ${i + 1}`);
             this.ledPositions.push([i, 0]);
@@ -120,7 +157,8 @@ export default class GoveeDeviceUI
             if (i % 2 === 0)
             {
                 result.push([255, 0, 0]);
-            } else {
+            } else
+            {
                 result.push([0, 0, 255]);
             }
         }
@@ -203,7 +241,7 @@ export default class GoveeDeviceUI
         {
             for (let i = totalColors; i < this.ledCount; i++)
             {
-                RGBData.push([0,0,0]);
+                RGBData.push([0, 0, 0]);
             }
         }
         return RGBData;
@@ -213,9 +251,9 @@ export default class GoveeDeviceUI
     {
         const RGBData = [];
     
-        for(const subdeviceId of this.subDevices)
+        for (const subdeviceId of this.subDevices)
         {
-            for(let i = 0 ; i < this.ledCount; i++)
+            for (let i = 0; i < this.ledCount; i++)
             {
                 const color = this.device.subdeviceColor(subdeviceId, i, 0);
                 RGBData.push(color);
@@ -229,7 +267,8 @@ export default class GoveeDeviceUI
     {
         const RGBData = [];
     
-        for(let i = 0 ; i < this.ledPositions.length; i++){
+        for (let i = 0; i < this.ledPositions.length; i++)
+        {
             const ledPosition = this.ledPositions[i];
             const color = this.device.color(ledPosition[0], ledPosition[1]);
             RGBData.push(color);
